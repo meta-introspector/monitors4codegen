@@ -1,3 +1,18 @@
+# Changes made,
+# Copyright (C) 2024 by James Michael Dupont for the Meta-Introspector Project
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 Multilspy logger module.
 """
@@ -25,7 +40,7 @@ class MultilspyLogger:
 
     def __init__(self) -> None:
         self.logger = logging.getLogger("multilspy")
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
 
     def log(self, debug_message: str, level: int, sanitized_error_message: str = "") -> None:
         """
@@ -51,7 +66,7 @@ class MultilspyLogger:
             caller_line=caller_line,
             message=debug_message,
         )
-
+        #print("DEBUG",debug_log_line.json())
         self.logger.log(
             level=level,
             msg=debug_log_line.json(),

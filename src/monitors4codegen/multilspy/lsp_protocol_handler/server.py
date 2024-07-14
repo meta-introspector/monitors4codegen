@@ -1,3 +1,18 @@
+# Changes made,
+# Copyright (C) 2024 by James Michael Dupont for the Meta-Introspector Project
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 This file provides the implementation of the JSON-RPC client, that launches and 
 communicates with the language server.
@@ -165,7 +180,7 @@ class LanguageServerHandler:
             that handle requests from the server.
         on_notification_handlers: A dictionary that maps method names to callback functions
             that handle notifications from the server.
-        logger: An optional function that takes two strings (source and destination) and
+        logger: function that takes two strings (source and destination) and
             a payload dictionary, and logs the communication between the client and the server.
         tasks: A dictionary that maps task ids to asyncio.Task objects that represent
             the asynchronous tasks created by the handler.
@@ -173,11 +188,11 @@ class LanguageServerHandler:
         loop: An asyncio.AbstractEventLoop object that represents the event loop used by the handler.
     """
 
-    def __init__(self, process_launch_info: ProcessLaunchInfo, logger=None) -> None:
+    def __init__(self, process_launch_info: ProcessLaunchInfo, logger) -> None:
         """
         Params:
             cmd: A string that represents the command to launch the language server process.
-            logger: An optional function that takes two strings (source and destination) and
+            logger: function that takes two strings (source and destination) and
                 a payload dictionary, and logs the communication between the client and the server.
         """
         self.send = LspRequest(self.send_request)
@@ -258,8 +273,7 @@ class LanguageServerHandler:
         """
         Create a log message
         """
-        if self.logger:
-            self.logger("client", "logger", message)
+        self.logger("client", "logger", message)
 
     async def run_forever(self) -> bool:
         """
@@ -319,8 +333,7 @@ class LanguageServerHandler:
         """
         Determine if the payload received from server is for a request, response, or notification and invoke the appropriate handler
         """
-        if self.logger:
-            self.logger("server", "client", payload)
+        self.logger("server", "client", payload)
         try:
             if "method" in payload:
                 if "id" in payload:
@@ -341,6 +354,9 @@ class LanguageServerHandler:
         self._send_payload_sync(make_notification(method, params))
 
     def send_response(self, request_id: Any, params: PayloadLike) -> None:
+        self.logger("client", "send_response", request_id,params)
+        self.logger("client", "send_response", params)
+
         """
         Send response to the given request id to the server with the given parameters
         """
@@ -362,6 +378,12 @@ class LanguageServerHandler:
         """
         Send request to the server, register the request id, and wait for the response
         """
+#        import pdb
+#        pdb.set_trace()
+        self.logger("client", "send_request_method", method)
+        self.logger("client", "send_request_params", params)
+        print( "debug_send_request", method, params)
+
         request = Request()
         request_id = self.request_id
         self.request_id += 1
@@ -380,8 +402,7 @@ class LanguageServerHandler:
         if not self.process or not self.process.stdin:
             return
         msg = create_message(payload)
-        if self.logger:
-            self.logger("client", "server", payload)
+        self.logger("client", "server", payload)
         self.process.stdin.writelines(msg)
 
     async def _send_payload(self, payload: StringDict) -> None:
@@ -391,8 +412,7 @@ class LanguageServerHandler:
         if not self.process or not self.process.stdin:
             return
         msg = create_message(payload)
-        if self.logger:
-            self.logger("client", "server", payload)
+        self.logger("client", "server", payload)
         self.process.stdin.writelines(msg)
         await self.process.stdin.drain()
 
@@ -459,7 +479,7 @@ class LanguageServerHandler:
         except asyncio.CancelledError:
             return
         except Exception as ex:
-            if (not self._received_shutdown) and self.logger:
+            if (not self._received_shutdown) :
                 self.logger(
                     "client",
                     "logger",

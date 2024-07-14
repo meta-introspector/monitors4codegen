@@ -48,6 +48,7 @@ class LspRequest:
     async def type_definition(
         self, params: lsp_types.TypeDefinitionParams
     ) -> Union["lsp_types.Definition", List["lsp_types.LocationLink"], None]:
+        print("type_definition",params)
         """A request to resolve the type definition locations of a symbol at a given text
         document position. The request's parameter is of type [TextDocumentPositionParams]
         (#TextDocumentPositionParams) the response is of type {@link Definition} or a
@@ -324,6 +325,7 @@ class LspRequest:
     async def definition(
         self, params: lsp_types.DefinitionParams
     ) -> Union["lsp_types.Definition", List["lsp_types.LocationLink"], None]:
+        print("definition",params)
         """A request to resolve the definition location of a symbol at a given text
         document position. The request's parameter is of type [TextDocumentPosition]
         (#TextDocumentPosition) the response is of either type {@link Definition}

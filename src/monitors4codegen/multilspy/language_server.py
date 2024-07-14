@@ -1,3 +1,18 @@
+# Changes made,
+# Copyright (C) 2024 by James Michael Dupont for the Meta-Introspector Project
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 This file contains the main interface and the public API for multilspy. 
 The abstract class LanguageServer provides a factory method, creator that is 
@@ -77,6 +92,12 @@ class LanguageServer:
             )
 
             return JediServer(config, logger, repository_root_path)
+        elif config.code_language == Language.SCHEME:
+            from monitors4codegen.multilspy.language_servers.scheme_language_server.scheme_server import (
+                SchemeServer,
+            )
+
+            return SchemeServer(config, logger, repository_root_path)
         elif config.code_language == Language.JAVA:
             from monitors4codegen.multilspy.language_servers.eclipse_jdtls.eclipse_jdtls import (
                 EclipseJDTLS,
@@ -352,6 +373,8 @@ class LanguageServer:
             )
             raise MultilspyException("Language Server not started")
 
+        #import pdb
+        #pdb.set_trace()
         with self.open_file(relative_file_path):
             # sending request to the language server and waiting for response
             response = await self.server.send.definition(
@@ -410,7 +433,9 @@ class LanguageServer:
             )
             ret.append(multilspy_types.Location(**new_item))
         else:
-            assert False, f"Unexpected response from Language Server: {response}"
+            #assert False, f"Unexpected response from Language Server: {response}"
+            print(f"Unexpected response from Language Server: {response}")
+            ret.append("FIXME")
 
         return ret
 
@@ -734,6 +759,9 @@ class SyncLanguageServer:
 
         :return List[multilspy_types.Location]: A list of locations where the symbol is defined
         """
+        #print("debug",file_path, line, column)
+        #test = self.language_server.request_definition(file_path, line, column)()
+        #print(test)
         result = asyncio.run_coroutine_threadsafe(
             self.language_server.request_definition(file_path, line, column), self.loop
         ).result()

@@ -31,7 +31,9 @@ class SchemeServer(LanguageServer):
             config,
             logger,
             repository_root_path,
-            ProcessLaunchInfo(cmd="guile-lsp-server", cwd=repository_root_path),
+            ProcessLaunchInfo(
+                cmd="guile-lsp-server --log-level debug",
+                cwd=repository_root_path),
             "scheme",
         )
     def _get_initialize_params(self, repository_absolute_path: str) -> InitializeParams:
